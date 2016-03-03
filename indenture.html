@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title> Indenture | An editor for digital contracts</title>
+
+  <script src="https://cdn.jsdelivr.net/g/clipboard.js@1.5.9,js-sha1@0.3.0,simplemde@1.10.0,filesaver.js@0.2"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/1.10.0/simplemde.min.css">
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body>
+  <h1 class="text-center"> Indenture
+  <h2 class="text-center"><small>An editor for digital contracts</small></h2>
+  <br>
+  <section style="max-width: 64rem;padding: 2rem 6rem;margin: auto;">
+    <textarea id="editor"># What is this
+1. Write or copy-paste the text of an agreement, statement or any text you want to have verifiable by one or more parties. You can use **markdown**.
+
+2. Click the blue button to append a stamp section with an hash of the text and a timestamp. Make every other party do the same: timestamps will differ but the hash must be identical.
+
+3. Click the green button to download a copy of the content with the stamp.
+
+4. Digitally sign the text. You can use [keybase](https://keybase.io).
+
+5. Send or publish your signed contract and get the other party's signed copy. If you use [keybase.pub](https://keybase.pub) you can just exchange links.
+
+6. Everyone can now verify that **YOU** signed **THAT** text at **THAT** time. If there are multiple parties you can verify that they signed the same text by quickly checking the hashes.
+
+This provides basic identity proof, integrity and non-repudiation with a few clicks and an easy-readable document.</textarea>
+    <script>
+    var simplemde = new SimpleMDE({ element: document.getElementById("editor"), spellChecker: false });
+    </script>
+  </section>
+  <section class="text-center">
+    <button id="stamp-btn" class="btn btn-primary" onclick="makeStamp()"><span class="glyphicon glyphicon-barcode"></span> Add Stamp</button>
+    <button id="raw-btn" class="btn btn-success" onclick="downloadBuffer()"><span class="glyphicon glyphicon-cloud-download"></span> Get the text</button>
+    <!-- <button id="copy-btn" class="btn btn-default" data-clipboard-target="#editor"><span class="glyphicon glyphicon-copy"></span> Copy </button> -->
+    <script>
+    function makeStamp() {
+      var currentBuffer = simplemde.value();
+      var hashOfBuffer = sha1(currentBuffer);
+      var timestamp = new Date();
+      simplemde.value(currentBuffer + "\n\n### Stamp\n|  Hash | Timestamp |\n|---------|----------------|\n|`" + hashOfBuffer + "`|`" + timestamp.toUTCString() + "`|");
+    }
+    function downloadBuffer() {
+      var currentBuffer = simplemde.value();
+      var hashOfBuffer = sha1(currentBuffer);
+      var timestamp = new Date();
+      var textAreaAsBlob = new Blob([currentBuffer], {type:'text:plain;charset=utf-8'});
+      saveAs(textAreaAsBlob, "indenture-"+timestamp.toISOString()+".md");
+    }
+    // var clipboard = new Clipboard('.btn');
+    // clipboard.on('success', function(e) {
+    //     console.log(e);
+    // });
+    // clipboard.on('error', function(e) {
+    //     console.log(e);
+    // });
+    </script>
+  </section>
+  <section id="footer" class="text-center" style="padding-top: 2rem; padding-bottom: 2rem;">
+    <span class="glyphicon glyphicon-pencil"></span><a href="https://keybase.io/sign"> Sign with keybase </a><br><br>
+    <span class="glyphicon glyphicon-thumbs-up"></span><em> Powered by SimpleMDE, js-sha1 and Bootstrap. Written by Manuel D'Orso (CirKu17). </em>
+  </section>
+</body>
+</html>
